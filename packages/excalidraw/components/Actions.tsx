@@ -240,7 +240,7 @@ export const ShapesSwitcher = ({
 
   return (
     <>
-      {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
+      {SHAPES.map(({ value, imageName, icon, key, numericKey, fillable }, index) => {
         if (
           UIOptions.tools?.[
             value as Extract<typeof value, keyof AppProps["UIOptions"]["tools"]>
@@ -280,6 +280,7 @@ export const ShapesSwitcher = ({
               if (value === "image") {
                 app.setActiveTool({
                   type: value,
+                  imageName:imageName,
                   insertOnCanvasDirectly: pointerType !== "mouse",
                 });
               } else {

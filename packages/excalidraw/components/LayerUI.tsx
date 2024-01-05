@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useState } from "react";
 import { ActionManager } from "../actions/manager";
 import {
   CLASSES,
@@ -54,7 +54,7 @@ import { LibraryIcon } from "./icons";
 import { UIAppStateContext } from "../context/ui-appState";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
-
+import data from "./BackendData/data.json";
 import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { mutateElement } from "../element/mutateElement";
@@ -63,7 +63,9 @@ import Scene from "../scene/Scene";
 import { LaserPointerButton } from "./LaserTool/LaserPointerButton";
 import { MagicSettings } from "./MagicSettings";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
-
+import { Source } from "./images/Source";
+import { Destination } from "./images/Destination";
+import { Datamodel } from "./images/Datamodel";
 interface LayerUIProps {
   actionManager: ActionManager;
   appState: UIAppState;
@@ -155,6 +157,7 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
+  const [buttonClicked, setButtonClicked] = useState("source");
 
   const [eyeDropperState, setEyeDropperState] = useAtom(
     activeEyeDropperAtom,
@@ -199,6 +202,70 @@ const LayerUI = ({
     );
   };
 
+  const handleButtonClick = (buttonType:string) => {
+    setButtonClicked(buttonType);
+  };
+  
+  const renderEndpoints = () => (
+    <>
+      <div style={{ display: "flex" }}>
+        <div style={{ width: "50%" }}>
+          <button
+            style={{ width: "100%", height: "32px", cursor: "pointer" }}
+            onClick={() => handleButtonClick("source")}
+          >
+            Source
+          </button>
+        </div>
+        <div style={{ width: "50%" }}>
+          <button
+            style={{ width: "100%", height: "32px", cursor: "pointer" }}
+            onClick={() => handleButtonClick("destination")}
+          >
+            Destination
+          </button>
+        </div>
+      </div>
+      <div style={{ marginTop: "15px" }}>
+        {buttonClicked === "source" ? <Source /> : <Destination />}
+      </div>
+      <div>
+        {data["endpoints"].map((item, i) => {
+          return (
+            item.type === buttonClicked && (
+              <p
+                key={i}
+                style={{ cursor: "pointer" }}
+                // onClick={() => handleClick(item)}
+              >
+                {item.name}
+              </p>
+            )
+          );
+        })}
+      </div>
+    </>
+  );
+
+  const renderDataModels = () => (
+    <>
+      <div style={{ marginTop: "15px" }}>
+        <Datamodel />
+      </div>
+      <div>
+        {data["Data-models"].map((item, i) => (
+          <p
+            key={i}
+            style={{ cursor: "pointer" }}
+            // onClick={() => handleClick(item)}
+          >
+            {item.name}
+          </p>
+        ))}
+      </div>
+    </>
+  );
+
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
       {/* wrapping to Fragment stops React from occasionally complaining
@@ -208,7 +275,15 @@ const LayerUI = ({
     </div>
   );
 
+  const displayItem = Object.keys(data).map((item, i) => (
+    <div key={i} style={{ minHeight: "283px" }}>
+      <p>{item === "endpoints" ? "End Points" : "Data Models"}</p>
+      {item === "endpoints" ? renderEndpoints() : renderDataModels()}
+    </div>
+  ));
+
   const renderSelectedShapeActions = () => (
+    
     <Section
       heading="selectedShapeActions"
       className={clsx("selected-shape-actions zen-mode-transition", {
@@ -224,11 +299,12 @@ const LayerUI = ({
           maxHeight: `${appState.height - 166}px`,
         }}
       >
-        <SelectedShapeActions
+        {displayItem}
+        {/* <SelectedShapeActions
           appState={appState}
           elements={elements}
           renderAction={actionManager.renderAction}
-        />
+        /> */}
       </Island>
     </Section>
   );
@@ -274,27 +350,27 @@ const LayerUI = ({
                         />
                         {heading}
                         <Stack.Row gap={1}>
-                          <PenModeButton
+                          {/* <PenModeButton
                             zenModeEnabled={appState.zenModeEnabled}
                             checked={appState.penMode}
                             onChange={() => onPenModeToggle(null)}
                             title={t("toolBar.penMode")}
                             penDetected={appState.penDetected}
-                          />
-                          <LockButton
+                          /> */}
+                          {/* <LockButton
                             checked={appState.activeTool.locked}
                             onChange={onLockToggle}
                             title={t("toolBar.lock")}
-                          />
+                          /> */}
 
-                          <div className="App-toolbar__divider" />
+                          {/* <div className="App-toolbar__divider" /> */}
 
-                          <HandButton
+                          {/* <HandButton
                             checked={isHandToolActive(appState)}
                             onChange={() => onHandToolToggle()}
                             title={t("toolBar.hand")}
                             isMobile
-                          />
+                          /> */}
 
                           <ShapesSwitcher
                             appState={appState}
